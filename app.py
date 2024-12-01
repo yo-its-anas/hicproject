@@ -18,9 +18,6 @@ def load_lottieurl(url):
 # Preferred Lottie Animation URL
 lottie_animation = load_lottieurl("https://assets10.lottiefiles.com/packages/lf20_tfb3estd.json")
 
-# Dummy user accounts for demonstration
-user_accounts = {"admin": "password123", "user1": "pass123", "test": "test"}
-
 # Karachi Areas with Coordinates (Dummy)
 areas_coordinates = {
     "Clifton": (24.8138, 67.0353),
@@ -108,11 +105,8 @@ elif choice == "Login":
     username = st.text_input("Username")
     password = st.text_input("Password", type="password")
     if st.button("Login"):
-        if username in user_accounts and user_accounts[username] == password:
-            st.success(f"Logged in as {username}")
-            blood_bank_finder(username)
-        else:
-            st.error("Invalid username or password")
+        st.success(f"Logged in as {username}")
+        blood_bank_finder(username)
 
 elif choice == "Create Account":
     st.subheader("Create a New Account")
@@ -120,7 +114,6 @@ elif choice == "Create Account":
     new_password = st.text_input("New Password", type="password")
     if st.button("Sign Up"):
         if new_user and new_password:
-            user_accounts[new_user] = new_password
             st.success(f"Account created for {new_user}. You can now log in.")
         else:
             st.error("Please fill in both fields.")
