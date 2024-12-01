@@ -18,6 +18,9 @@ def load_lottieurl(url):
 # Preferred Lottie Animation URL
 lottie_animation = load_lottieurl("https://assets10.lottiefiles.com/packages/lf20_tfb3estd.json")
 
+# Dummy user accounts for demonstration
+user_accounts = {"admin": "password123", "user1": "pass123", "test": "test"}
+
 # Karachi Areas with Coordinates (Dummy)
 areas_coordinates = {
     "Clifton": (24.8138, 67.0353),
@@ -52,40 +55,72 @@ blood_banks = [
 ]
 
 # Streamlit Configuration
-st.set_page_config(page_title="Karachi Blood Bank Finder", layout="centered")
+st.set_page_config(page_title="Karachi Blood Bank Finder", layout="wide")
 
-# Animation Display
+# Navigation Options
+menu = ["Home", "Login", "Create Account"]
+choice = st.sidebar.selectbox("Menu", menu)
+
+# Lottie Animation
 if lottie_animation:
     st_lottie(lottie_animation, height=300)
 else:
     st.warning("Animation unavailable. Proceeding with app.")
 
-st.markdown("<h1 style='text-align: center; color: red;'>Karachi Blood Bank Finder 🩸</h1>", unsafe_allow_html=True)
+# Home Page or Blood Bank Finder
+def blood_bank_finder(username=None):
+    st.markdown("<h1 style='text-align: center; color: red;'>Karachi Blood Bank Finder 🩸</h1>", unsafe_allow_html=True)
+    if username:
+        st.success(f"Welcome, {username}!")
+    selected_area = st.selectbox("Select Your Area:", list(areas_coordinates.keys()))
+    selected_blood_group = st.selectbox("Select Required Blood Group:", ["A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-"])
+    
+    if st.button("Find Blood Banks"):
+        with st.spinner("Searching..."):
+            time.sleep(3)
+        found_banks = []
+        for bank in blood_banks:
+            distance = geodesic(areas_coordinates[selected_area], areas_coordinates[bank["location"]]).km
+            if selected_blood_group in bank["groups"]:
+                found_banks.append((bank, f"{distance:.2f} km"))
+                
+        if found_banks:
+            st.success("Blood Banks Found:")
+            for bank, distance in found_banks:
+                st.markdown(f"""
+                <div style='border: 2px solid blue; padding: 10px; margin: 10px 0; border-radius: 8px;'>
+                <strong>{bank["name"]}</strong><br>
+                📍 Location: {bank["location"]} ({distance})<br>
+                💉 Available Groups: {', '.join(bank["groups"])}<br>
+                📞 Contact: {bank["contact"]}<br>
+                🌐 <a href='{bank["website"]}' target='_blank'>Website</a>
+                </div>
+                """, unsafe_allow_html=True)
+        else:
+            st.error("No blood banks found for your selected criteria.")
 
-# Main App Page
-selected_area = st.selectbox("Select Your Area:", list(areas_coordinates.keys()))
-selected_blood_group = st.selectbox("Select Required Blood Group:", ["A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-"])
+# Handle Menu Choices
+if choice == "Home":
+    blood_bank_finder()
 
-if st.button("Find Blood Banks"):
-    with st.spinner("Searching..."):
-        time.sleep(3)
-    found_banks = []
-    for bank in blood_banks:
-        distance = geodesic(areas_coordinates[selected_area], areas_coordinates[bank["location"]]).km
-        if selected_blood_group in bank["groups"]:
-            found_banks.append((bank, f"{distance:.2f} km"))
-            
-    if found_banks:
-        st.success("Blood Banks Found:")
-        for bank, distance in found_banks:
-            st.markdown(f"""
-            <div style='border: 2px solid blue; padding: 10px; margin: 10px 0; border-radius: 8px;'>
-            <strong>{bank["name"]}</strong><br>
-            📍 Location: {bank["location"]} ({distance})<br>
-            💉 Available Groups: {', '.join(bank["groups"])}<br>
-            📞 Contact: {bank["contact"]}<br>
-            🌐 <a href='{bank["website"]}' target='_blank'>Website</a>
-            </div>
-            """, unsafe_allow_html=True)
-    else:
-        st.error("No blood banks found for your selected criteria.")
+elif choice == "Login":
+    st.subheader("Login to Your Account")
+    username = st.text_input("Username")
+    password = st.text_input("Password", type="password")
+    if st.button("Login"):
+        if username in user_accounts and user_accounts[username] == password:
+            st.success(f"Logged in as {username}")
+            blood_bank_finder(username)
+        else:
+            st.error("Invalid username or password")
+
+elif choice == "Create Account":
+    st.subheader("Create a New Account")
+    new_user = st.text_input("New Username")
+    new_password = st.text_input("New Password", type="password")
+    if st.button("Sign Up"):
+        if new_user and new_password:
+            user_accounts[new_user] = new_password
+            st.success(f"Account created for {new_user}. You can now log in.")
+        else:
+            st.error("Please fill in both fields.")
