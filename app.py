@@ -40,69 +40,6 @@ blood_banks = [
     {"name": "Indus Hospital", "location": "Korangi", "groups": ["B+", "O+", "A+"], "contact": "021-9988776", "website": "https://indushospital.org"},
     {"name": "Agha Khan Blood Center", "location": "Defence", "groups": ["O-", "A+", "B-"], "contact": "021-2345678", "website": "https://aku.edu"},
     {"name": "LifeLine Blood Center", "location": "Nazimabad", "groups": ["AB-", "O-", "B+"], "contact": "021-8765432", "website": "https://lifeline.pk"},
-    {
-        "name": "Saylani Blood Donation Center",
-        "location": "Gulistan-e-Johar",
-        "groups": ["A-", "O+", "AB-"],
-        "contact": "021-3344556",
-        "website": "https://saylaniwelfare.com"
-    },
-    {
-        "name": "Edhi Blood Bank",
-        "location": "Landhi",
-        "groups": ["B-", "AB+", "O-"],
-        "contact": "021-5566778",
-        "website": "https://edhi.org"
-    },
-    {
-        "name": "Pakistan Red Crescent Blood Bank",
-        "location": "Saddar",
-        "groups": ["A+", "AB-", "B+"],
-        "contact": "021-9876543",
-        "website": "https://prcs.org.pk"
-    },
-    {
-        "name": "Jinnah Hospital Blood Center",
-        "location": "Gulshan-e-Iqbal",
-        "groups": ["O+", "A-", "B-"],
-        "contact": "021-5678910",
-        "website": "https://jinnahhospital.org"
-    },
-    {
-        "name": "Omar Hospital Blood Bank",
-        "location": "PECHS",
-        "groups": ["A+", "B-", "O+"],
-        "contact": "021-6677889",
-        "website": "https://omarhospital.pk"
-    },
-    {
-        "name": "Hilal-e-Ahmer Blood Center",
-        "location": "Korangi",
-        "groups": ["O-", "A+", "AB+"],
-        "contact": "021-4455667",
-        "website": "https://hilaaleahmer.org"
-    },
-    {
-        "name": "Shifa Blood Center",
-        "location": "Shah Faisal",
-        "groups": ["B+", "O-", "A+"],
-        "contact": "021-9988775",
-        "website": "https://shifabloodcenter.pk"
-    },
-    {
-        "name": "LifeBlood Foundation",
-        "location": "Orangi Town",
-        "groups": ["O+", "B-", "A-"],
-        "contact": "021-1122334",
-        "website": "https://lifeblood.pk"
-    },
-    {
-        "name": "Razia Medical Blood Bank",
-        "location": "Malir",
-        "groups": ["AB-", "O+", "B+"],
-        "contact": "021-2211445",
-        "website": "https://raziamedical.pk"
-    },
 ]
 
 st.set_page_config(page_title="Karachi Blood Bank Finder", layout="wide")
