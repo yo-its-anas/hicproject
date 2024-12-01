@@ -2,21 +2,24 @@ import streamlit as st
 import time
 import requests
 from geopy.distance import geodesic
-
-# Import Lottie animation support
 from streamlit_lottie import st_lottie
 
 # Load Lottie Animation
 def load_lottieurl(url):
-    response = requests.get(url)
-    if response.status_code != 200:
+    try:
+        response = requests.get(url)
+        if response.status_code == 200:
+            return response.json()
+        else:
+            return None
+    except requests.exceptions.RequestException:
         return None
-    return response.json()
 
-# Lottie Animation URL
-blood_animation = load_lottieurl("https://assets8.lottiefiles.com/packages/lf20_bouu4z6f.json")
+# Lottie Animation URL (Check or replace if URL changes)
+animation_url = "https://assets8.lottiefiles.com/packages/lf20_bouu4z6f.json"
+blood_animation = load_lottieurl(animation_url)
 
-# Karachi Areas with Coordinates (Dummy Coordinates)
+# Karachi Areas with Coordinates (Dummy)
 areas_coordinates = {
     "Clifton": (24.8138, 67.0353),
     "Saddar": (24.8608, 67.0104),
@@ -35,38 +38,44 @@ areas_coordinates = {
     "Federal B Area": (24.9344, 67.0833),
 }
 
-# Expanded Dummy Blood Bank Data
+# Dummy Blood Banks with Expanded List
 blood_banks = [
     {"name": "Karachi Blood Center", "location": "Clifton", "groups": ["A+", "O+", "B-"], "contact": "021-1234567", "website": "https://karachibloodcenter.org"},
     {"name": "Fatimid Foundation", "location": "Saddar", "groups": ["AB+", "O-", "A-"], "contact": "021-7654321", "website": "https://fatimid.org"},
-    {"name": "Indus Hospital Blood Center", "location": "Korangi", "groups": ["B+", "O+", "A+"], "contact": "021-9988776", "website": "https://indushospital.org"},
+    {"name": "Indus Hospital", "location": "Korangi", "groups": ["B+", "O+", "A+"], "contact": "021-9988776", "website": "https://indushospital.org"},
     {"name": "Agha Khan Blood Center", "location": "Defence", "groups": ["O-", "A+", "B-"], "contact": "021-2345678", "website": "https://aku.edu"},
     {"name": "LifeLine Blood Center", "location": "Nazimabad", "groups": ["AB-", "O-", "B+"], "contact": "021-8765432", "website": "https://lifeline.pk"},
-    {"name": "Jinnah Hospital Blood Bank", "location": "Malir", "groups": ["A-", "O+", "B-"], "contact": "021-1239876", "website": "https://jinnah.pk"},
-    # Add 10+ more dummy banks as needed for college display.
+    {"name": "Jinnah Blood Bank", "location": "Malir", "groups": ["A-", "O+", "B-"], "contact": "021-1239876", "website": "https://jinnah.pk"},
+    {"name": "Al-Mustafa Welfare", "location": "PECHS", "groups": ["A+", "B+", "AB+"], "contact": "021-6789654", "website": "https://almustafawelfare.org"},
+    {"name": "Owais Qarni Trust", "location": "Gulberg", "groups": ["O+", "A-", "B-"], "contact": "021-7861234", "website": "https://owaisqarni.pk"},
+    {"name": "Pakistan Red Crescent", "location": "Landhi", "groups": ["AB+", "A+", "O-"], "contact": "021-4356789", "website": "https://prcs.org.pk"},
+    {"name": "Al-Khidmat Foundation", "location": "North Karachi", "groups": ["B+", "O-", "AB-"], "contact": "021-1234098", "website": "https://alkhidmat.org"},
+    # Add more dummy banks if needed
 ]
 
 # Streamlit Configuration
 st.set_page_config(page_title="Karachi Blood Bank Finder", layout="centered")
 
-# Lottie Animation at the top
-st_lottie(blood_animation, height=300)
+if blood_animation:
+    st_lottie(blood_animation, height=300)
+else:
+    st.warning("Animation unavailable. Proceeding with app.")
 
 st.markdown("<h1 style='text-align: center; color: red;'>Karachi Blood Bank Finder 🩸</h1>", unsafe_allow_html=True)
 
-# Sidebar for Login/Signup
 st.sidebar.title("User Authentication")
-auth_status = False
 
 if "user_authenticated" not in st.session_state:
     st.session_state["user_authenticated"] = False
 
-user_choice = st.sidebar.radio("Choose an option:", ["Login", "Create Account"])
+user_choice = st.sidebar.radio("Choose:", ["Login", "Create Account"])
+
 if user_choice == "Create Account":
     new_username = st.sidebar.text_input("Enter Username")
     new_password = st.sidebar.text_input("Enter Password", type="password")
     if st.sidebar.button("Sign Up"):
-        st.sidebar.success("Account created successfully! Please log in.")
+        st.sidebar.success("Account created. Please log in.")
+
 elif user_choice == "Login":
     username = st.sidebar.text_input("Username")
     password = st.sidebar.text_input("Password", type="password")
@@ -76,10 +85,10 @@ elif user_choice == "Login":
 
 if st.session_state["user_authenticated"]:
     st.sidebar.button("Logout", on_click=lambda: st.session_state.update({"user_authenticated": False}))
-    
+
     selected_area = st.selectbox("Select Your Area:", list(areas_coordinates.keys()))
     selected_blood_group = st.selectbox("Select Required Blood Group:", ["A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-"])
-    
+
     if st.button("Find Blood Banks"):
         with st.spinner("Searching..."):
             time.sleep(3)
