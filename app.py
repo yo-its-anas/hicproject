@@ -37,26 +37,17 @@ areas_coordinates = {
     "Federal B Area": (24.9344, 67.0833),
 }
 
-# Dummy Blood Banks with Expanded List
+# Dummy Blood Banks
 blood_banks = [
     {"name": "Karachi Blood Center", "location": "Clifton", "groups": ["A+", "O+", "B-"], "contact": "021-1234567", "website": "https://karachibloodcenter.org"},
     {"name": "Fatimid Foundation", "location": "Saddar", "groups": ["AB+", "O-", "A-"], "contact": "021-7654321", "website": "https://fatimid.org"},
     {"name": "Indus Hospital", "location": "Korangi", "groups": ["B+", "O+", "A+"], "contact": "021-9988776", "website": "https://indushospital.org"},
     {"name": "Agha Khan Blood Center", "location": "Defence", "groups": ["O-", "A+", "B-"], "contact": "021-2345678", "website": "https://aku.edu"},
     {"name": "LifeLine Blood Center", "location": "Nazimabad", "groups": ["AB-", "O-", "B+"], "contact": "021-8765432", "website": "https://lifeline.pk"},
-    {"name": "Jinnah Blood Bank", "location": "Malir", "groups": ["A-", "O+", "B-"], "contact": "021-1239876", "website": "https://jinnah.pk"},
-    {"name": "Al-Mustafa Welfare", "location": "PECHS", "groups": ["A+", "B+", "AB+"], "contact": "021-6789654", "website": "https://almustafawelfare.org"},
-    {"name": "Owais Qarni Trust", "location": "Gulberg", "groups": ["O+", "A-", "B-"], "contact": "021-7861234", "website": "https://owaisqarni.pk"},
-    {"name": "Pakistan Red Crescent", "location": "Landhi", "groups": ["AB+", "A+", "O-"], "contact": "021-4356789", "website": "https://prcs.org.pk"},
-    {"name": "Al-Khidmat Foundation", "location": "North Karachi", "groups": ["B+", "O-", "AB-"], "contact": "021-1234098", "website": "https://alkhidmat.org"},
 ]
 
 # Streamlit Configuration
 st.set_page_config(page_title="Karachi Blood Bank Finder", layout="wide")
-
-# Navigation Options
-menu = ["Home", "Login", "Create Account"]
-choice = st.sidebar.selectbox("Menu", menu)
 
 # Lottie Animation
 if lottie_animation:
@@ -64,7 +55,10 @@ if lottie_animation:
 else:
     st.warning("Animation unavailable. Proceeding with app.")
 
-# Home Page or Blood Bank Finder
+# Menu Navigation Options
+menu = st.radio("Navigation", ["Home", "Login", "Create Account"], horizontal=True)
+
+# Blood Bank Finder Logic
 def blood_bank_finder(username=None):
     st.markdown("<h1 style='text-align: center; color: red;'>Karachi Blood Bank Finder 🩸</h1>", unsafe_allow_html=True)
     if username:
@@ -96,19 +90,20 @@ def blood_bank_finder(username=None):
         else:
             st.error("No blood banks found for your selected criteria.")
 
-# Handle Menu Choices
-if choice == "Home":
+# Handle Menu Options
+if menu == "Home":
     blood_bank_finder()
 
-elif choice == "Login":
+elif menu == "Login":
     st.subheader("Login to Your Account")
     username = st.text_input("Username")
     password = st.text_input("Password", type="password")
     if st.button("Login"):
         st.success(f"Logged in as {username}")
+        st.empty()  # Hide fields after successful login
         blood_bank_finder(username)
 
-elif choice == "Create Account":
+elif menu == "Create Account":
     st.subheader("Create a New Account")
     new_user = st.text_input("New Username")
     new_password = st.text_input("New Password", type="password")
