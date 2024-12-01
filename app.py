@@ -15,9 +15,8 @@ def load_lottieurl(url):
     except requests.exceptions.RequestException:
         return None
 
-# Lottie Animation URL (Check or replace if URL changes)
-animation_url = "https://assets8.lottiefiles.com/packages/lf20_bouu4z6f.json"
-blood_animation = load_lottieurl(animation_url)
+# Preferred Lottie Animation URL
+lottie_animation = load_lottieurl("https://assets10.lottiefiles.com/packages/lf20_tfb3estd.json")
 
 # Karachi Areas with Coordinates (Dummy)
 areas_coordinates = {
@@ -50,67 +49,43 @@ blood_banks = [
     {"name": "Owais Qarni Trust", "location": "Gulberg", "groups": ["O+", "A-", "B-"], "contact": "021-7861234", "website": "https://owaisqarni.pk"},
     {"name": "Pakistan Red Crescent", "location": "Landhi", "groups": ["AB+", "A+", "O-"], "contact": "021-4356789", "website": "https://prcs.org.pk"},
     {"name": "Al-Khidmat Foundation", "location": "North Karachi", "groups": ["B+", "O-", "AB-"], "contact": "021-1234098", "website": "https://alkhidmat.org"},
-    # Add more dummy banks if needed
 ]
 
 # Streamlit Configuration
 st.set_page_config(page_title="Karachi Blood Bank Finder", layout="centered")
 
-if blood_animation:
-    st_lottie(blood_animation, height=300)
+# Animation Display
+if lottie_animation:
+    st_lottie(lottie_animation, height=300)
 else:
     st.warning("Animation unavailable. Proceeding with app.")
 
 st.markdown("<h1 style='text-align: center; color: red;'>Karachi Blood Bank Finder 🩸</h1>", unsafe_allow_html=True)
 
-st.sidebar.title("User Authentication")
+# Main App Page
+selected_area = st.selectbox("Select Your Area:", list(areas_coordinates.keys()))
+selected_blood_group = st.selectbox("Select Required Blood Group:", ["A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-"])
 
-if "user_authenticated" not in st.session_state:
-    st.session_state["user_authenticated"] = False
-
-user_choice = st.sidebar.radio("Choose:", ["Login", "Create Account"])
-
-if user_choice == "Create Account":
-    new_username = st.sidebar.text_input("Enter Username")
-    new_password = st.sidebar.text_input("Enter Password", type="password")
-    if st.sidebar.button("Sign Up"):
-        st.sidebar.success("Account created. Please log in.")
-
-elif user_choice == "Login":
-    username = st.sidebar.text_input("Username")
-    password = st.sidebar.text_input("Password", type="password")
-    if st.sidebar.button("Login"):
-        st.session_state["user_authenticated"] = True
-        st.sidebar.success(f"Welcome, {username}!")
-
-if st.session_state["user_authenticated"]:
-    st.sidebar.button("Logout", on_click=lambda: st.session_state.update({"user_authenticated": False}))
-
-    selected_area = st.selectbox("Select Your Area:", list(areas_coordinates.keys()))
-    selected_blood_group = st.selectbox("Select Required Blood Group:", ["A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-"])
-
-    if st.button("Find Blood Banks"):
-        with st.spinner("Searching..."):
-            time.sleep(3)
-        found_banks = []
-        for bank in blood_banks:
-            distance = geodesic(areas_coordinates[selected_area], areas_coordinates[bank["location"]]).km
-            if selected_blood_group in bank["groups"]:
-                found_banks.append((bank, f"{distance:.2f} km"))
-                
-        if found_banks:
-            st.success("Blood Banks Found:")
-            for bank, distance in found_banks:
-                st.markdown(f"""
-                <div style='border: 2px solid blue; padding: 10px; margin: 10px 0; border-radius: 8px;'>
-                <strong>{bank["name"]}</strong><br>
-                📍 Location: {bank["location"]} ({distance})<br>
-                💉 Available Groups: {', '.join(bank["groups"])}<br>
-                📞 Contact: {bank["contact"]}<br>
-                🌐 <a href='{bank["website"]}' target='_blank'>Website</a>
-                </div>
-                """, unsafe_allow_html=True)
-        else:
-            st.error("No blood banks found for your selected criteria.")
-else:
-    st.info("Please log in or create an account.")
+if st.button("Find Blood Banks"):
+    with st.spinner("Searching..."):
+        time.sleep(3)
+    found_banks = []
+    for bank in blood_banks:
+        distance = geodesic(areas_coordinates[selected_area], areas_coordinates[bank["location"]]).km
+        if selected_blood_group in bank["groups"]:
+            found_banks.append((bank, f"{distance:.2f} km"))
+            
+    if found_banks:
+        st.success("Blood Banks Found:")
+        for bank, distance in found_banks:
+            st.markdown(f"""
+            <div style='border: 2px solid blue; padding: 10px; margin: 10px 0; border-radius: 8px;'>
+            <strong>{bank["name"]}</strong><br>
+            📍 Location: {bank["location"]} ({distance})<br>
+            💉 Available Groups: {', '.join(bank["groups"])}<br>
+            📞 Contact: {bank["contact"]}<br>
+            🌐 <a href='{bank["website"]}' target='_blank'>Website</a>
+            </div>
+            """, unsafe_allow_html=True)
+    else:
+        st.error("No blood banks found for your selected criteria.")
