@@ -4,7 +4,6 @@ import requests
 from geopy.distance import geodesic
 from streamlit_lottie import st_lottie
 
-# Load Lottie Animation
 def load_lottieurl(url):
     try:
         response = requests.get(url)
@@ -15,10 +14,8 @@ def load_lottieurl(url):
     except requests.exceptions.RequestException:
         return None
 
-# Preferred Lottie Animation URL
 lottie_animation = load_lottieurl("https://assets10.lottiefiles.com/packages/lf20_tfb3estd.json")
 
-# Karachi Areas with Coordinates (Dummy)
 areas_coordinates = {
     "Clifton": (24.8138, 67.0353),
     "Saddar": (24.8608, 67.0104),
@@ -37,7 +34,6 @@ areas_coordinates = {
     "Federal B Area": (24.9344, 67.0833),
 }
 
-# Dummy Blood Banks
 blood_banks = [
     {"name": "Karachi Blood Center", "location": "Clifton", "groups": ["A+", "O+", "B-"], "contact": "021-1234567", "website": "https://karachibloodcenter.org"},
     {"name": "Fatimid Foundation", "location": "Saddar", "groups": ["AB+", "O-", "A-"], "contact": "021-7654321", "website": "https://fatimid.org"},
@@ -46,19 +42,16 @@ blood_banks = [
     {"name": "LifeLine Blood Center", "location": "Nazimabad", "groups": ["AB-", "O-", "B+"], "contact": "021-8765432", "website": "https://lifeline.pk"},
 ]
 
-# Streamlit Configuration
 st.set_page_config(page_title="Karachi Blood Bank Finder", layout="wide")
 
-# Lottie Animation
 if lottie_animation:
     st_lottie(lottie_animation, height=300)
 else:
     st.warning("Animation unavailable. Proceeding with app.")
 
-# Menu Navigation Options
 menu = st.radio("Navigation", ["Home", "Login", "Create Account"], horizontal=True)
+logged_in = st.session_state.get("logged_in", False)
 
-# Blood Bank Finder Logic
 def blood_bank_finder(username=None):
     st.markdown("<h1 style='text-align: center; color: red;'>Karachi Blood Bank Finder 🩸</h1>", unsafe_allow_html=True)
     if username:
@@ -90,19 +83,20 @@ def blood_bank_finder(username=None):
         else:
             st.error("No blood banks found for your selected criteria.")
 
-# Handle Menu Options
-if menu == "Home":
-    blood_bank_finder()
-
+if menu == "Home" or logged_in:
+    if not logged_in:
+        blood_bank_finder()
 elif menu == "Login":
-    st.subheader("Login to Your Account")
-    username = st.text_input("Username")
-    password = st.text_input("Password", type="password")
-    if st.button("Login"):
-        st.success(f"Logged in as {username}")
-        st.empty()  # Hide fields after successful login
-        blood_bank_finder(username)
-
+    if not logged_in:
+        st.subheader("Login to Your Account")
+        username = st.text_input("Username")
+        password = st.text_input("Password", type="password")
+        if st.button("Login"):
+            st.session_state.logged_in = True
+            st.session_state.username = username
+            st.experimental_rerun()
+    else:
+        blood_bank_finder(st.session_state.username)
 elif menu == "Create Account":
     st.subheader("Create a New Account")
     new_user = st.text_input("New Username")
